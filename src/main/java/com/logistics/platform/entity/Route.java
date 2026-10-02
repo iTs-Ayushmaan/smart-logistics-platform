@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "routes")
 @Getter
@@ -53,6 +56,7 @@ public class Route {
     @Column(name = "completed_orders")
     private Integer completedOrders = 0;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "route_sequence", columnDefinition = "jsonb")
     private String routeSequence;
 

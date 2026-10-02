@@ -6,6 +6,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 @Entity
 @Table(name = "gps_logs")
 @Getter
@@ -40,6 +42,7 @@ public class GpsLog {
     @Column(name = "accuracy_meters", precision = 8, scale = 2)
     private BigDecimal accuracyMeters;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime timestamp;
 }
