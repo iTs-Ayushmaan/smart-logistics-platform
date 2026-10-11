@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.RouteOrder;
+import com.logistics.platform.dto.CreateRouteOrderDTO;
+import com.logistics.platform.dto.RouteOrderResponseDTO;
+import com.logistics.platform.dto.UpdateRouteOrderDTO;
 import com.logistics.platform.service.RouteOrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +20,17 @@ public class RouteOrderController {
         this.routeOrderService = routeOrderService;
     }
 
+    // Get all route orders
     @GetMapping
-    public List<RouteOrder> getAllRouteOrders() {
-        return routeOrderService.getAllRouteOrders();
+    public ResponseEntity<List<RouteOrderResponseDTO>> getAllRouteOrders() {
+        return ResponseEntity.ok(
+                routeOrderService.getAllRouteOrders()
+        );
     }
 
+    // Get route order by ID
     @GetMapping("/{id}")
-    public ResponseEntity<RouteOrder> getRouteOrderById(
+    public ResponseEntity<RouteOrderResponseDTO> getRouteOrderById(
             @PathVariable Integer id) {
 
         return routeOrderService.getRouteOrderById(id)
@@ -31,46 +38,64 @@ public class RouteOrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get route orders by route ID
     @GetMapping("/route/{routeId}")
-    public List<RouteOrder> getRouteOrdersByRouteId(
+    public ResponseEntity<List<RouteOrderResponseDTO>> getRouteOrdersByRouteId(
             @PathVariable Integer routeId) {
 
-        return routeOrderService.getRouteOrdersByRouteId(routeId);
+        return ResponseEntity.ok(
+                routeOrderService.getRouteOrdersByRouteId(routeId)
+        );
     }
 
+    // Get route orders by order ID
     @GetMapping("/order/{orderId}")
-    public List<RouteOrder> getRouteOrdersByOrderId(
+    public ResponseEntity<List<RouteOrderResponseDTO>> getRouteOrdersByOrderId(
             @PathVariable Integer orderId) {
 
-        return routeOrderService.getRouteOrdersByOrderId(orderId);
+        return ResponseEntity.ok(
+                routeOrderService.getRouteOrdersByOrderId(orderId)
+        );
     }
 
+    // Get route orders by status
     @GetMapping("/status/{status}")
-    public List<RouteOrder> getRouteOrdersByStatus(
+    public ResponseEntity<List<RouteOrderResponseDTO>> getRouteOrdersByStatus(
             @PathVariable String status) {
 
-        return routeOrderService.getRouteOrdersByStatus(status);
+        return ResponseEntity.ok(
+                routeOrderService.getRouteOrdersByStatus(status)
+        );
     }
 
+    // Create route order
     @PostMapping
-    public RouteOrder createRouteOrder(
-            @RequestBody RouteOrder routeOrder) {
+    public ResponseEntity<RouteOrderResponseDTO> createRouteOrder(
+            @Valid @RequestBody CreateRouteOrderDTO request) {
 
-        return routeOrderService.createRouteOrder(routeOrder);
+        return ResponseEntity.ok(
+                routeOrderService.createRouteOrder(request)
+        );
     }
 
-    @PutMapping
-    public RouteOrder updateRouteOrder(
-            @RequestBody RouteOrder routeOrder) {
+    // Update route order
+    @PutMapping("/{id}")
+    public ResponseEntity<RouteOrderResponseDTO> updateRouteOrder(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateRouteOrderDTO request) {
 
-        return routeOrderService.updateRouteOrder(routeOrder);
+        return ResponseEntity.ok(
+                routeOrderService.updateRouteOrder(id, request)
+        );
     }
 
+    // Delete route order
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRouteOrder(
             @PathVariable Integer id) {
 
         routeOrderService.deleteRouteOrder(id);
+
         return ResponseEntity.noContent().build();
     }
 }

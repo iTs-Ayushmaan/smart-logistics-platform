@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.AuditLog;
+import com.logistics.platform.dto.AuditLogResponseDTO;
+import com.logistics.platform.dto.CreateAuditLogDTO;
+import com.logistics.platform.dto.UpdateAuditLogDTO;
 import com.logistics.platform.service.AuditLogService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,53 +20,81 @@ public class AuditLogController {
         this.auditLogService = auditLogService;
     }
 
+    // Get all audit logs
     @GetMapping
-    public List<AuditLog> getAllAuditLogs() {
-        return auditLogService.getAllAuditLogs();
+    public ResponseEntity<List<AuditLogResponseDTO>> getAllAuditLogs() {
+        return ResponseEntity.ok(auditLogService.getAllAuditLogs());
     }
 
+    // Get audit log by ID
     @GetMapping("/{id}")
-    public ResponseEntity<AuditLog> getAuditLogById(@PathVariable Integer id) {
+    public ResponseEntity<AuditLogResponseDTO> getAuditLogById(
+            @PathVariable Integer id) {
+
         return auditLogService.getAuditLogById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get audit logs by actor ID
     @GetMapping("/actor/{actorId}")
-    public List<AuditLog> getAuditLogsByActorId(
+    public ResponseEntity<List<AuditLogResponseDTO>> getAuditLogsByActorId(
             @PathVariable Integer actorId) {
 
-        return auditLogService.getAuditLogsByActorId(actorId);
+        return ResponseEntity.ok(
+                auditLogService.getAuditLogsByActorId(actorId)
+        );
     }
 
+    // Get audit logs by entity
     @GetMapping("/entity/{entityType}/{entityId}")
-    public List<AuditLog> getAuditLogsByEntity(
+    public ResponseEntity<List<AuditLogResponseDTO>> getAuditLogsByEntity(
             @PathVariable String entityType,
             @PathVariable Integer entityId) {
 
-        return auditLogService.getAuditLogsByEntity(entityType, entityId);
+        return ResponseEntity.ok(
+                auditLogService.getAuditLogsByEntity(entityType, entityId)
+        );
     }
 
+    // Get audit logs by action
     @GetMapping("/action/{action}")
-    public List<AuditLog> getAuditLogsByAction(
+    public ResponseEntity<List<AuditLogResponseDTO>> getAuditLogsByAction(
             @PathVariable String action) {
 
-        return auditLogService.getAuditLogsByAction(action);
+        return ResponseEntity.ok(
+                auditLogService.getAuditLogsByAction(action)
+        );
     }
 
+    // Create audit log
     @PostMapping
-    public AuditLog createAuditLog(@RequestBody AuditLog auditLog) {
-        return auditLogService.createAuditLog(auditLog);
+    public ResponseEntity<AuditLogResponseDTO> createAuditLog(
+            @Valid @RequestBody CreateAuditLogDTO request) {
+
+        return ResponseEntity.ok(
+                auditLogService.createAuditLog(request)
+        );
     }
 
-    @PutMapping
-    public AuditLog updateAuditLog(@RequestBody AuditLog auditLog) {
-        return auditLogService.updateAuditLog(auditLog);
+    // Update audit log
+    @PutMapping("/{id}")
+    public ResponseEntity<AuditLogResponseDTO> updateAuditLog(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateAuditLogDTO request) {
+
+        return ResponseEntity.ok(
+                auditLogService.updateAuditLog(id, request)
+        );
     }
 
+    // Delete audit log
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAuditLog(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteAuditLog(
+            @PathVariable Integer id) {
+
         auditLogService.deleteAuditLog(id);
+
         return ResponseEntity.noContent().build();
     }
 }

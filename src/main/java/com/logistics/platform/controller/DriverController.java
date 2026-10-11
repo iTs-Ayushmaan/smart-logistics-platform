@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.Driver;
+import com.logistics.platform.dto.CreateDriverDTO;
+import com.logistics.platform.dto.DriverResponseDTO;
+import com.logistics.platform.dto.UpdateDriverDTO;
 import com.logistics.platform.service.DriverService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,48 +20,80 @@ public class DriverController {
         this.driverService = driverService;
     }
 
+    // Get all drivers
     @GetMapping
-    public List<Driver> getAllDrivers() {
-        return driverService.getAllDrivers();
+    public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
+        return ResponseEntity.ok(driverService.getAllDrivers());
     }
 
+    // Get driver by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Driver> getDriverById(@PathVariable Integer id) {
+    public ResponseEntity<DriverResponseDTO> getDriverById(
+            @PathVariable Integer id) {
+
         return driverService.getDriverById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get drivers by status
     @GetMapping("/status/{status}")
-    public List<Driver> getDriversByStatus(@PathVariable String status) {
-        return driverService.getDriversByStatus(status);
+    public ResponseEntity<List<DriverResponseDTO>> getDriversByStatus(
+            @PathVariable String status) {
+
+        return ResponseEntity.ok(
+                driverService.getDriversByStatus(status)
+        );
     }
 
+    // Get drivers by vehicle type
     @GetMapping("/vehicle-type/{vehicleType}")
-    public List<Driver> getDriversByVehicleType(
+    public ResponseEntity<List<DriverResponseDTO>> getDriversByVehicleType(
             @PathVariable String vehicleType) {
-        return driverService.getDriversByVehicleType(vehicleType);
+
+        return ResponseEntity.ok(
+                driverService.getDriversByVehicleType(vehicleType)
+        );
     }
 
+    // Get drivers by user ID
     @GetMapping("/user/{userId}")
-    public List<Driver> getDriversByUserId(
+    public ResponseEntity<List<DriverResponseDTO>> getDriversByUserId(
             @PathVariable Integer userId) {
-        return driverService.getDriversByUserId(userId);
+
+        return ResponseEntity.ok(
+                driverService.getDriversByUserId(userId)
+        );
     }
 
+    // Create driver
     @PostMapping
-    public Driver createDriver(@RequestBody Driver driver) {
-        return driverService.createDriver(driver);
+    public ResponseEntity<DriverResponseDTO> createDriver(
+            @Valid @RequestBody CreateDriverDTO request) {
+
+        return ResponseEntity.ok(
+                driverService.createDriver(request)
+        );
     }
 
-    @PutMapping
-    public Driver updateDriver(@RequestBody Driver driver) {
-        return driverService.updateDriver(driver);
+    // Update driver
+    @PutMapping("/{id}")
+    public ResponseEntity<DriverResponseDTO> updateDriver(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateDriverDTO request) {
+
+        return ResponseEntity.ok(
+                driverService.updateDriver(id, request)
+        );
     }
 
+    // Delete driver
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteDriver(
+            @PathVariable Integer id) {
+
         driverService.deleteDriver(id);
+
         return ResponseEntity.noContent().build();
     }
 }

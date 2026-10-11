@@ -18,9 +18,18 @@ public class RouteResponseDTO {
     private LocalDate routeDate;
     private String status;
 
-    private BigDecimal totalDistanceKm;
-    private Integer estimatedTimeMinutes;
-    private BigDecimal totalCost;
+    private BigDecimal estimatedTotalDistanceKm;
+    private BigDecimal actualTotalDistanceKm;
+
+    private Integer estimatedTotalTimeMinutes;
+    private Integer actualTotalTimeMinutes;
+
+    private BigDecimal estimatedCostRupees;
+    private BigDecimal actualCostRupees;
+
+//    private BigDecimal totalDistanceKm;
+//    private Integer estimatedTimeMinutes;
+//    private BigDecimal totalCost;
 
     private Integer totalOrders;
     private Integer completedOrders;
@@ -29,7 +38,7 @@ public class RouteResponseDTO {
 
     private String optimizedBy;
     private LocalDateTime optimizationTimestamp;
-    private Integer optimizationDurationMs;
+    private BigDecimal optimizationDurationSeconds;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

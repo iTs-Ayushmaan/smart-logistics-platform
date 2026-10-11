@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.RouteDecision;
+import com.logistics.platform.dto.CreateRouteDecisionDTO;
+import com.logistics.platform.dto.RouteDecisionResponseDTO;
+import com.logistics.platform.dto.UpdateRouteDecisionDTO;
 import com.logistics.platform.service.RouteDecisionService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +20,17 @@ public class RouteDecisionController {
         this.routeDecisionService = routeDecisionService;
     }
 
+    // Get all route decisions
     @GetMapping
-    public List<RouteDecision> getAllRouteDecisions() {
-        return routeDecisionService.getAllRouteDecisions();
+    public ResponseEntity<List<RouteDecisionResponseDTO>> getAllRouteDecisions() {
+        return ResponseEntity.ok(
+                routeDecisionService.getAllRouteDecisions()
+        );
     }
 
+    // Get route decision by ID
     @GetMapping("/{id}")
-    public ResponseEntity<RouteDecision> getRouteDecisionById(
+    public ResponseEntity<RouteDecisionResponseDTO> getRouteDecisionById(
             @PathVariable Integer id) {
 
         return routeDecisionService.getRouteDecisionById(id)
@@ -31,48 +38,64 @@ public class RouteDecisionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get decisions by route ID
     @GetMapping("/route/{routeId}")
-    public List<RouteDecision> getRouteDecisionsByRouteId(
+    public ResponseEntity<List<RouteDecisionResponseDTO>> getRouteDecisionsByRouteId(
             @PathVariable Integer routeId) {
 
-        return routeDecisionService.getRouteDecisionsByRouteId(routeId);
+        return ResponseEntity.ok(
+                routeDecisionService.getRouteDecisionsByRouteId(routeId)
+        );
     }
 
+    // Get decisions by status
     @GetMapping("/status/{decisionStatus}")
-    public List<RouteDecision> getRouteDecisionsByStatus(
+    public ResponseEntity<List<RouteDecisionResponseDTO>> getRouteDecisionsByStatus(
             @PathVariable String decisionStatus) {
 
-        return routeDecisionService
-                .getRouteDecisionsByStatus(decisionStatus);
+        return ResponseEntity.ok(
+                routeDecisionService.getRouteDecisionsByStatus(decisionStatus)
+        );
     }
 
+    // Get decisions by approver
     @GetMapping("/approved-by/{approvedBy}")
-    public List<RouteDecision> getRouteDecisionsByApprovedBy(
+    public ResponseEntity<List<RouteDecisionResponseDTO>> getRouteDecisionsByApprovedBy(
             @PathVariable Integer approvedBy) {
 
-        return routeDecisionService
-                .getRouteDecisionsByApprovedBy(approvedBy);
+        return ResponseEntity.ok(
+                routeDecisionService.getRouteDecisionsByApprovedBy(approvedBy)
+        );
     }
 
+    // Create route decision
     @PostMapping
-    public RouteDecision createRouteDecision(
-            @RequestBody RouteDecision routeDecision) {
+    public ResponseEntity<RouteDecisionResponseDTO> createRouteDecision(
+            @Valid @RequestBody CreateRouteDecisionDTO request) {
 
-        return routeDecisionService.createRouteDecision(routeDecision);
+        return ResponseEntity.ok(
+                routeDecisionService.createRouteDecision(request)
+        );
     }
 
-    @PutMapping
-    public RouteDecision updateRouteDecision(
-            @RequestBody RouteDecision routeDecision) {
+    // Update route decision
+    @PutMapping("/{id}")
+    public ResponseEntity<RouteDecisionResponseDTO> updateRouteDecision(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateRouteDecisionDTO request) {
 
-        return routeDecisionService.updateRouteDecision(routeDecision);
+        return ResponseEntity.ok(
+                routeDecisionService.updateRouteDecision(id, request)
+        );
     }
 
+    // Delete route decision
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRouteDecision(
             @PathVariable Integer id) {
 
         routeDecisionService.deleteRouteDecision(id);
+
         return ResponseEntity.noContent().build();
     }
 }

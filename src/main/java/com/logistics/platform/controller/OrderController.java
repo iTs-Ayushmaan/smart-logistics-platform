@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.Order;
+import com.logistics.platform.dto.CreateOrderDTO;
+import com.logistics.platform.dto.OrderResponseDTO;
+import com.logistics.platform.dto.UpdateOrderDTO;
 import com.logistics.platform.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,60 +20,100 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    // Get all orders
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
 
+    // Get order by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Integer id) {
+    public ResponseEntity<OrderResponseDTO> getOrderById(
+            @PathVariable Integer id) {
+
         return orderService.getOrderById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get orders by status
     @GetMapping("/status/{status}")
-    public List<Order> getOrdersByStatus(@PathVariable String status) {
-        return orderService.getOrdersByStatus(status);
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(
+            @PathVariable String status) {
+
+        return ResponseEntity.ok(
+                orderService.getOrdersByStatus(status)
+        );
     }
 
+    // Get orders by customer ID
     @GetMapping("/customer/{customerId}")
-    public List<Order> getOrdersByCustomerId(
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByCustomerId(
             @PathVariable Integer customerId) {
-        return orderService.getOrdersByCustomerId(customerId);
+
+        return ResponseEntity.ok(
+                orderService.getOrdersByCustomerId(customerId)
+        );
     }
 
+    // Get orders by driver ID
     @GetMapping("/driver/{driverId}")
-    public List<Order> getOrdersByDriverId(
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByDriverId(
             @PathVariable Integer driverId) {
-        return orderService.getOrdersByDriverId(driverId);
+
+        return ResponseEntity.ok(
+                orderService.getOrdersByDriverId(driverId)
+        );
     }
 
+    // Get orders by route ID
     @GetMapping("/route/{routeId}")
-    public List<Order> getOrdersByRouteId(
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByRouteId(
             @PathVariable Integer routeId) {
-        return orderService.getOrdersByRouteId(routeId);
+
+        return ResponseEntity.ok(
+                orderService.getOrdersByRouteId(routeId)
+        );
     }
 
+    // Get orders by priority
     @GetMapping("/priority/{priority}")
-    public List<Order> getOrdersByPriority(
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByPriority(
             @PathVariable String priority) {
-        return orderService.getOrdersByPriority(priority);
+
+        return ResponseEntity.ok(
+                orderService.getOrdersByPriority(priority)
+        );
     }
 
+    // Create order
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    public ResponseEntity<OrderResponseDTO> createOrder(
+            @Valid @RequestBody CreateOrderDTO request) {
+
+        return ResponseEntity.ok(
+                orderService.createOrder(request)
+        );
     }
 
-    @PutMapping
-    public Order updateOrder(@RequestBody Order order) {
-        return orderService.updateOrder(order);
+    // Update order
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderResponseDTO> updateOrder(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateOrderDTO request) {
+
+        return ResponseEntity.ok(
+                orderService.updateOrder(id, request)
+        );
     }
 
+    // Delete order
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteOrder(
+            @PathVariable Integer id) {
+
         orderService.deleteOrder(id);
+
         return ResponseEntity.noContent().build();
     }
 }

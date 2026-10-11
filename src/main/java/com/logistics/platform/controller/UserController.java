@@ -1,7 +1,10 @@
 package com.logistics.platform.controller;
 
-import com.logistics.platform.entity.User;
+import com.logistics.platform.dto.CreateUserRequest;
+import com.logistics.platform.dto.UpdateUserRequest;
+import com.logistics.platform.dto.UserResponseDTO;
 import com.logistics.platform.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,21 +20,27 @@ public class UserController {
         this.userService = userService;
     }
 
+    // Get all users
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    // Get user by ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Integer id) {
+
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get user by email
     @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = userService.getUserByEmail(email);
+    public ResponseEntity<UserResponseDTO> getUserByEmail(
+            @PathVariable String email) {
+
+        UserResponseDTO user = userService.getUserByEmail(email);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -40,9 +49,12 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // Get user by username
     @GetMapping("/username/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        User user = userService.getUserByUsername(username);
+    public ResponseEntity<UserResponseDTO> getUserByUsername(
+            @PathVariable String username) {
+
+        UserResponseDTO user = userService.getUserByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -51,19 +63,29 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // Create user
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public ResponseEntity<UserResponseDTO> createUser(
+            @Valid @RequestBody CreateUserRequest request) {
+
+        return ResponseEntity.ok(userService.createUser(request));
     }
 
-    @PutMapping
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    // Update user
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateUserRequest request) {
+
+        return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
+    // Delete user
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
+
         userService.deleteUser(id);
+
         return ResponseEntity.noContent().build();
     }
 }
