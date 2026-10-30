@@ -5,6 +5,7 @@ import com.logistics.platform.dto.UpdateUserRequest;
 import com.logistics.platform.dto.UserResponseDTO;
 import com.logistics.platform.entity.User;
 import com.logistics.platform.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
+    private final PasswordEncoder passwordEncoder;
 
     // Get all users
     public List<UserResponseDTO> getAllUsers() {
@@ -64,8 +71,9 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setRole(request.getRole());
 
-        // Password hashing will be added with authentication/security.
-        user.setPasswordHash(request.getPassword());
+        user.setPasswordHash(
+                passwordEncoder.encode(request.getPassword())
+        );
 
         User savedUser = userRepository.save(user);
 
@@ -92,8 +100,9 @@ public class UserService {
         }
 
         if (request.getPassword() != null) {
-            // Password hashing will be added with authentication/security.
-            user.setPasswordHash(request.getPassword());
+            user.setPasswordHash(
+                    passwordEncoder.encode(request.getPassword())
+            );
         }
 
         User updatedUser = userRepository.save(user);
