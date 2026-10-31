@@ -49,9 +49,11 @@ public class Order {
     @Column(name = "time_window_end", nullable = false)
     private LocalDateTime timeWindowEnd;
 
+    @Builder.Default
     @Column(length = 50)
     private String priority = "NORMAL";
 
+    @Builder.Default
     @Column(length = 50)
     private String status = "PENDING";
 
@@ -75,4 +77,16 @@ public class Order {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

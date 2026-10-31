@@ -1,6 +1,9 @@
 package com.logistics.platform.dto;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,19 +14,29 @@ import java.time.LocalDateTime;
 @Setter
 public class UpdateOrderDTO {
 
+    @DecimalMin("-90")
+    @DecimalMax("90")
     private BigDecimal pickupLatitude;
 
+    @DecimalMin("-180")
+    @DecimalMax("180")
     private BigDecimal pickupLongitude;
 
+    @DecimalMin("-90")
+    @DecimalMax("90")
     private BigDecimal deliveryLatitude;
 
+    @DecimalMin("-180")
+    @DecimalMax("180")
     private BigDecimal deliveryLongitude;
 
+//    @NotBlank(message = "Delivery address cannot be blank")
     private String deliveryAddress;
 
-    @DecimalMin(value = "0.01", message = "Package weight must be greater than 0")
+    @DecimalMin("0.01")
     private BigDecimal packageWeightKg;
 
+    @Min(1)
     private Integer packageUnits;
 
     private LocalDateTime timeWindowStart;
