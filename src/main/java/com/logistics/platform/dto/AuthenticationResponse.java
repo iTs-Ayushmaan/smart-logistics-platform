@@ -1,17 +1,11 @@
 package com.logistics.platform.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-//@Setter
-//@Getter
 public class AuthenticationResponse {
 
     private String message;
     private Integer userId;
     private String username;
     private String role;
-
     private String token;
 
     public AuthenticationResponse() {
@@ -31,6 +25,38 @@ public class AuthenticationResponse {
         this.token = token;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getToken() {
         return token;
     }
@@ -38,5 +64,4 @@ public class AuthenticationResponse {
     public void setToken(String token) {
         this.token = token;
     }
-
 }

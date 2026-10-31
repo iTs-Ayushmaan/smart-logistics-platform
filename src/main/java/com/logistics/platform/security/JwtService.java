@@ -22,10 +22,12 @@ public class JwtService {
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(String username, String role) {
+
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
@@ -43,27 +45,37 @@ public class JwtService {
     }
 
     public String extractRole(String token) {
-        return extractClaim(token, claims ->
-                claims.get("role", String.class));
+        return extractClaim(
+                token,
+                claims -> claims.get("role", String.class)
+        );
     }
 
-    public boolean isTokenValid(String token, String expectedUsername) {
-        String username = extractUsername(token);
-        return username.equals(expectedUsername)
-                && extractClaim(token, Claims::getExpiration)
-                .after(new Date());
+    public boolean isTokenValid(
+            String token,
+            String expectedUsername
+    ) {
+        Claims claims = extractAllClaims(token);
+
+        return expectedUsername.equals(claims.getSubject())
+                && claims.getExpiration() != null
+                && claims.getExpiration().after(new Date());
     }
 
     private <T> T extractClaim(
             String token,
             Function<Claims, T> resolver
     ) {
-        Claims claims = Jwts.parser()
+        Claims claims = extractAllClaims(token);
+        return resolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
-        return resolver.apply(claims);
     }
 }
