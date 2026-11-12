@@ -4,22 +4,31 @@ import com.logistics.platform.dto.CreateDriverDTO;
 import com.logistics.platform.dto.DriverResponseDTO;
 import com.logistics.platform.dto.UpdateDriverDTO;
 import com.logistics.platform.entity.Driver;
+import com.logistics.platform.entity.User;
 import com.logistics.platform.repository.DriverRepository;
+import com.logistics.platform.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
 public class DriverService {
 
     private final DriverRepository driverRepository;
+    private final UserRepository userRepository;
 
-    public DriverService(DriverRepository driverRepository) {
+    public DriverService(
+            DriverRepository driverRepository,
+            UserRepository userRepository
+    ) {
         this.driverRepository = driverRepository;
+        this.userRepository = userRepository;
     }
 
-    // Get all drivers
     public List<DriverResponseDTO> getAllDrivers() {
         return driverRepository.findAll()
                 .stream()
@@ -27,29 +36,28 @@ public class DriverService {
                 .toList();
     }
 
-    // Get driver by ID
     public Optional<DriverResponseDTO> getDriverById(Integer id) {
         return driverRepository.findById(id)
                 .map(this::toResponseDTO);
     }
 
-    // Get drivers by status
     public List<DriverResponseDTO> getDriversByStatus(String status) {
-        return driverRepository.findByStatus(status)
+        return driverRepository.findByStatus(
+                        status.trim().toUpperCase(Locale.ROOT))
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
-    // Get drivers by vehicle type
-    public List<DriverResponseDTO> getDriversByVehicleType(String vehicleType) {
+    public List<DriverResponseDTO> getDriversByVehicleType(
+            String vehicleType) {
+
         return driverRepository.findByVehicleType(vehicleType)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
-    // Get drivers by user ID
     public List<DriverResponseDTO> getDriversByUserId(Integer userId) {
         return driverRepository.findByUserId(userId)
                 .stream()
@@ -57,40 +65,80 @@ public class DriverService {
                 .toList();
     }
 
-    // Create driver
     public DriverResponseDTO createDriver(CreateDriverDTO request) {
+
+        // 1. Verify that the user exists.
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
+                ));
+
+        // 2. Only DRIVER accounts can have driver profiles.
+        if (!"DRIVER".equalsIgnoreCase(user.getRole())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The selected user does not have the DRIVER role"
+            );
+        }
+
+        // 3. Prevent duplicate driver profiles.
+        if (driverRepository.existsByUserId(user.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "A driver profile already exists for this user"
+            );
+        }
 
         Driver driver = new Driver();
 
-        driver.setUserId(request.getUserId());
-        driver.setName(request.getName());
-        driver.setPhone(request.getPhone());
+        driver.setUserId(user.getId());
+        driver.setName(request.getName().trim());
+        driver.setPhone(request.getPhone().trim());
         driver.setVehicleType(request.getVehicleType());
         driver.setVehicleCapacityKg(request.getVehicleCapacityKg());
         driver.setVehicleCapacityUnits(request.getVehicleCapacityUnits());
         driver.setCurrentLatitude(request.getCurrentLatitude());
         driver.setCurrentLongitude(request.getCurrentLongitude());
-        driver.setStatus(request.getStatus());
-        driver.setAvailabilityStartTime(request.getAvailabilityStartTime());
-        driver.setAvailabilityEndTime(request.getAvailabilityEndTime());
+
+        String status = request.getStatus();
+
+        driver.setStatus(
+                status == null || status.isBlank()
+                        ? "INACTIVE"
+                        : status.trim().toUpperCase(Locale.ROOT)
+        );
+
+        driver.setAvailabilityStartTime(
+                request.getAvailabilityStartTime()
+        );
+
+        driver.setAvailabilityEndTime(
+                request.getAvailabilityEndTime()
+        );
 
         Driver savedDriver = driverRepository.save(driver);
 
         return toResponseDTO(savedDriver);
     }
 
-    // Update driver
-    public DriverResponseDTO updateDriver(Integer id, UpdateDriverDTO request) {
+    public DriverResponseDTO updateDriver(
+            Integer id,
+            UpdateDriverDTO request
+    ) {
 
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Driver not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Driver not found"
+                ));
 
         if (request.getName() != null) {
-            driver.setName(request.getName());
+            driver.setName(request.getName().trim());
         }
 
         if (request.getPhone() != null) {
-            driver.setPhone(request.getPhone());
+            driver.setPhone(request.getPhone().trim());
         }
 
         if (request.getVehicleType() != null) {
@@ -102,7 +150,9 @@ public class DriverService {
         }
 
         if (request.getVehicleCapacityUnits() != null) {
-            driver.setVehicleCapacityUnits(request.getVehicleCapacityUnits());
+            driver.setVehicleCapacityUnits(
+                    request.getVehicleCapacityUnits()
+            );
         }
 
         if (request.getCurrentLatitude() != null) {
@@ -114,15 +164,21 @@ public class DriverService {
         }
 
         if (request.getStatus() != null) {
-            driver.setStatus(request.getStatus());
+            driver.setStatus(
+                    request.getStatus().trim().toUpperCase(Locale.ROOT)
+            );
         }
 
         if (request.getAvailabilityStartTime() != null) {
-            driver.setAvailabilityStartTime(request.getAvailabilityStartTime());
+            driver.setAvailabilityStartTime(
+                    request.getAvailabilityStartTime()
+            );
         }
 
         if (request.getAvailabilityEndTime() != null) {
-            driver.setAvailabilityEndTime(request.getAvailabilityEndTime());
+            driver.setAvailabilityEndTime(
+                    request.getAvailabilityEndTime()
+            );
         }
 
         Driver updatedDriver = driverRepository.save(driver);
@@ -130,12 +186,18 @@ public class DriverService {
         return toResponseDTO(updatedDriver);
     }
 
-    // Delete driver
     public void deleteDriver(Integer id) {
+
+        if (!driverRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Driver not found"
+            );
+        }
+
         driverRepository.deleteById(id);
     }
 
-    // Convert Entity -> Response DTO
     private DriverResponseDTO toResponseDTO(Driver driver) {
 
         DriverResponseDTO dto = new DriverResponseDTO();

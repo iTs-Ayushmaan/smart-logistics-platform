@@ -6,12 +6,14 @@ import com.logistics.platform.dto.UpdateDriverDTO;
 import com.logistics.platform.service.DriverService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/drivers")
+@PreAuthorize("hasRole('ADMIN')")
 public class DriverController {
 
     private final DriverService driverService;
@@ -20,13 +22,11 @@ public class DriverController {
         this.driverService = driverService;
     }
 
-    // Get all drivers
     @GetMapping
     public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
         return ResponseEntity.ok(driverService.getAllDrivers());
     }
 
-    // Get driver by ID
     @GetMapping("/{id}")
     public ResponseEntity<DriverResponseDTO> getDriverById(
             @PathVariable Integer id) {
@@ -36,7 +36,6 @@ public class DriverController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Get drivers by status
     @GetMapping("/status/{status}")
     public ResponseEntity<List<DriverResponseDTO>> getDriversByStatus(
             @PathVariable String status) {
@@ -46,7 +45,6 @@ public class DriverController {
         );
     }
 
-    // Get drivers by vehicle type
     @GetMapping("/vehicle-type/{vehicleType}")
     public ResponseEntity<List<DriverResponseDTO>> getDriversByVehicleType(
             @PathVariable String vehicleType) {
@@ -56,7 +54,6 @@ public class DriverController {
         );
     }
 
-    // Get drivers by user ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<DriverResponseDTO>> getDriversByUserId(
             @PathVariable Integer userId) {
@@ -66,17 +63,14 @@ public class DriverController {
         );
     }
 
-    // Create driver
     @PostMapping
     public ResponseEntity<DriverResponseDTO> createDriver(
             @Valid @RequestBody CreateDriverDTO request) {
 
-        return ResponseEntity.ok(
-                driverService.createDriver(request)
-        );
+        return ResponseEntity.status(201)
+                .body(driverService.createDriver(request));
     }
 
-    // Update driver
     @PutMapping("/{id}")
     public ResponseEntity<DriverResponseDTO> updateDriver(
             @PathVariable Integer id,
@@ -87,13 +81,11 @@ public class DriverController {
         );
     }
 
-    // Delete driver
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDriver(
             @PathVariable Integer id) {
 
         driverService.deleteDriver(id);
-
         return ResponseEntity.noContent().build();
     }
 }

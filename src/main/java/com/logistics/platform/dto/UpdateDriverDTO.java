@@ -1,7 +1,6 @@
 package com.logistics.platform.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,22 +11,31 @@ import java.time.LocalTime;
 @Setter
 public class UpdateDriverDTO {
 
-    @Size(max = 255, message = "Name must not exceed 255 characters")
+    @NotBlank
+    @Size(max = 255)
     private String name;
 
-    @Size(max = 20, message = "Phone must not exceed 20 characters")
+    @Pattern(
+            regexp = "^\\+?[0-9 ()-]{7,20}$",
+            message = "Invalid phone number"
+    )
     private String phone;
 
-    @Size(max = 50, message = "Vehicle type must not exceed 50 characters")
+    @Size(max = 50)
     private String vehicleType;
 
-    @DecimalMin(value = "0.01", message = "Vehicle capacity must be greater than 0")
+    @DecimalMin("0.01")
     private BigDecimal vehicleCapacityKg;
 
+    @Min(1)
     private Integer vehicleCapacityUnits;
 
+    @DecimalMin("-90.0")
+    @DecimalMax("90.0")
     private BigDecimal currentLatitude;
 
+    @DecimalMin("-180.0")
+    @DecimalMax("180.0")
     private BigDecimal currentLongitude;
 
     private String status;

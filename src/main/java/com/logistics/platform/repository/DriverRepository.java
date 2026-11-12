@@ -14,4 +14,6 @@ public interface DriverRepository extends JpaRepository<Driver, Integer> {
     List<Driver> findByVehicleType(String vehicleType);
 
     List<Driver> findByUserId(Integer userId);
+
+    boolean existsByUserId(Integer userId);
 }
